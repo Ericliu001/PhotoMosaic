@@ -16,8 +16,10 @@
 
 package com.example.ericliu.photomosaic.mvp;
 
+import android.app.Activity;
+
 public interface DisplayView<T> {
 
-
+    Activity activity();
 
 }
