@@ -1,10 +1,13 @@
 package com.example.ericliu.photomosaic;
 
 import android.app.Activity;
+import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 
 public class MainActivity extends AppCompatActivity implements HomePageContract.View {
 
@@ -12,6 +15,7 @@ public class MainActivity extends AppCompatActivity implements HomePageContract.
     private HomePageContract.HomePresenter mHomePresenter;
 
     private Button btnPickPhoto;
+    private ImageView ivMain;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +47,8 @@ public class MainActivity extends AppCompatActivity implements HomePageContract.
                 mHomePresenter.onPickPhotoButtonClicked(v);
             }
         });
+
+        ivMain = (ImageView) findViewById(R.id.ivMain);
     }
 
 
@@ -67,4 +73,14 @@ public class MainActivity extends AppCompatActivity implements HomePageContract.
     }
 
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        mHomePresenter.onActivityResult(requestCode, resultCode, data);
+    }
+
+
+    @Override
+    public void displayImage(Bitmap bitmap) {
+        ivMain.setImageBitmap(bitmap);
+    }
 }

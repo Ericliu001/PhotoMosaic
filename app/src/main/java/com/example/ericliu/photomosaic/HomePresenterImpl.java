@@ -1,7 +1,14 @@
 package com.example.ericliu.photomosaic;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.net.Uri;
+import android.provider.MediaStore;
 import android.view.View;
+
+import java.io.IOException;
+
+import static android.app.Activity.RESULT_OK;
 
 /**
  * Created by ericliu on 23/07/2016.
@@ -9,7 +16,7 @@ import android.view.View;
 
 public class HomePresenterImpl implements HomePageContract.HomePresenter {
 
-    private static final int REQUESTO_CODE_PICK_IMAGE = 10;
+    private static final int REQUEST_IMAGE_GET = 10;
     private HomePageContract.View mView;
 
     @Override
@@ -30,15 +37,33 @@ public class HomePresenterImpl implements HomePageContract.HomePresenter {
 
     @Override
     public void onPickPhotoButtonClicked(View view) {
-        Intent getIntent = new Intent(Intent.ACTION_GET_CONTENT);
-        getIntent.setType("image/*");
+       selectImage();
+    }
 
-        Intent pickIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        pickIntent.setType("image/*");
+    public void selectImage() {
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType("image/*");
+        if (intent.resolveActivity(mView.activity().getPackageManager()) != null) {
+            mView.startActivityForResult(intent, REQUEST_IMAGE_GET);
+        }
+    }
 
-        Intent chooserIntent = Intent.createChooser(getIntent, "Select Image");
-        chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[]{pickIntent});
 
-        mView.startActivityForResult(chooserIntent, REQUESTO_CODE_PICK_IMAGE);
+
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_IMAGE_GET && resultCode == RESULT_OK) {
+            Bitmap thumbnail = data.getParcelableExtra("data");
+            Uri fullPhotoUri = data.getData();
+
+            try {
+                Bitmap bitmap = MediaStore.Images.Media.getBitmap(mView.activity().getContentResolver(), fullPhotoUri);
+            // Do work with photo saved at fullPhotoUri
+                mView.displayImage(bitmap);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }
