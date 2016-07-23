@@ -18,6 +18,7 @@ public class HomePresenterImpl implements HomePageContract.HomePresenter {
 
     private static final int REQUEST_IMAGE_GET = 10;
     private HomePageContract.View mView;
+    private Bitmap mBitmap;
 
     @Override
     public void setView(HomePageContract.View view) {
@@ -27,7 +28,9 @@ public class HomePresenterImpl implements HomePageContract.HomePresenter {
 
     @Override
     public void onViewCreated(boolean isConfigurationChange) {
-
+        if (isConfigurationChange) {
+            mView.displayImage(mBitmap);
+        }
     }
 
     @Override
@@ -58,9 +61,9 @@ public class HomePresenterImpl implements HomePageContract.HomePresenter {
             Uri fullPhotoUri = data.getData();
 
             try {
-                Bitmap bitmap = MediaStore.Images.Media.getBitmap(mView.activity().getContentResolver(), fullPhotoUri);
+                 mBitmap = MediaStore.Images.Media.getBitmap(mView.activity().getContentResolver(), fullPhotoUri);
             // Do work with photo saved at fullPhotoUri
-                mView.displayImage(bitmap);
+                mView.displayImage(mBitmap);
             } catch (IOException e) {
                 e.printStackTrace();
             }
