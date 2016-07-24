@@ -16,6 +16,14 @@
         tools:layout_editor_absoluteY="0dp"
         android:id="@+id/btnPickPhoto"/>
 
+
+    <Button
+        android:text="Make Mosaic"
+        android:layout_width="192dp"
+        android:layout_height="65dp"
+        android:layout_toRightOf="@id/btnPickPhoto"
+        android:id="@+id/btnMosaic"/>
+
     <com.example.ericliu.photomosaic.ui.MosaicView
         android:layout_width="match_parent"
         android:layout_height="match_parent"

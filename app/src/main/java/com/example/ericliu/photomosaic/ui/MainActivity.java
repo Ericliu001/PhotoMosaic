@@ -16,7 +16,7 @@ public class MainActivity extends AppCompatActivity implements HomePageContract.
     private static final String TAG = MainActivity.class.getSimpleName();
     private HomePageContract.HomePresenter mHomePresenter;
 
-    private Button btnPickPhoto;
+    private Button btnPickPhoto, btnMosaic;
     private MosaicView ivMain;
 
     @Override
@@ -50,6 +50,13 @@ public class MainActivity extends AppCompatActivity implements HomePageContract.
             }
         });
 
+        btnMosaic = (Button) findViewById(R.id.btnMosaic);
+        btnMosaic.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ivMain.drawMosaic();
+            }
+        });
         ivMain = (MosaicView) findViewById(R.id.ivMain);
     }
 
