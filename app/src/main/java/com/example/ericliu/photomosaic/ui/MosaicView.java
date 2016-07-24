@@ -8,6 +8,8 @@ import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.view.View;
 
+import com.example.ericliu.photomosaic.util.BitmapUtils;
+
 /**
  * Created by ericliu on 24/07/2016.
  */
@@ -64,18 +66,18 @@ public class MosaicView extends View {
 
         for (int horIndex = 0; horIndex < horCount; ++horIndex) {
             for (int verIndex = 0; verIndex < verCount; ++verIndex) {
-                int l = mGridWidth * horIndex;
-                int t = mGridWidth * verIndex;
-                int r = l + mGridWidth;
-                if (r > mImageWidth) {
-                    r = mImageWidth;
+                int left = mGridWidth * horIndex;
+                int top = mGridWidth * verIndex;
+                int right = left + mGridWidth;
+                if (right > mImageWidth) {
+                    right = mImageWidth;
                 }
-                int b = t + mGridWidth;
-                if (b > mImageHeight) {
-                    b = mImageHeight;
+                int bottom = top + mGridWidth;
+                if (bottom > mImageHeight) {
+                    bottom = mImageHeight;
                 }
-                int color = bmBaseLayer.getPixel(l, t);
-                Rect rect = new Rect(l, t, r, b);
+                Rect rect = new Rect(left, top, right, bottom);
+                int color = BitmapUtils.getAverageColor(bmBaseLayer, rect);
                 paint.setColor(color);
                 canvas.drawRect(rect, paint);
             }
