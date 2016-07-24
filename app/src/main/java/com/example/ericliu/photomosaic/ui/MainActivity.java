@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
 
 import com.example.ericliu.photomosaic.CacheFragment;
 import com.example.ericliu.photomosaic.R;
@@ -18,7 +17,7 @@ public class MainActivity extends AppCompatActivity implements HomePageContract.
     private HomePageContract.HomePresenter mHomePresenter;
 
     private Button btnPickPhoto;
-    private ImageView ivMain;
+    private MosaicView ivMain;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,7 +50,7 @@ public class MainActivity extends AppCompatActivity implements HomePageContract.
             }
         });
 
-        ivMain = (ImageView) findViewById(R.id.ivMain);
+        ivMain = (MosaicView) findViewById(R.id.ivMain);
     }
 
 

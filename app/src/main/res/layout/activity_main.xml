@@ -16,10 +16,9 @@
         tools:layout_editor_absoluteY="0dp"
         android:id="@+id/btnPickPhoto"/>
 
-    <ImageView
+    <com.example.ericliu.photomosaic.ui.MosaicView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:srcCompat="@color/colorAccent"
         android:layout_below="@+id/btnPickPhoto"
         android:layout_alignParentStart="true"
         android:id="@+id/ivMain"/>
