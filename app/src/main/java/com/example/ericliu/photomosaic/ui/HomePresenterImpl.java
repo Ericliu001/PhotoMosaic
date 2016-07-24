@@ -1,4 +1,4 @@
-package com.example.ericliu.photomosaic;
+package com.example.ericliu.photomosaic.ui;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -29,7 +29,9 @@ public class HomePresenterImpl implements HomePageContract.HomePresenter {
     @Override
     public void onViewCreated(boolean isConfigurationChange) {
         if (isConfigurationChange) {
-            mView.displayImage(mBitmap);
+            if (mBitmap != null) {
+                mView.displayImage(mBitmap);
+            }
         }
     }
 
@@ -40,7 +42,7 @@ public class HomePresenterImpl implements HomePageContract.HomePresenter {
 
     @Override
     public void onPickPhotoButtonClicked(View view) {
-       selectImage();
+        selectImage();
     }
 
     public void selectImage() {
@@ -52,8 +54,6 @@ public class HomePresenterImpl implements HomePageContract.HomePresenter {
     }
 
 
-
-
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_IMAGE_GET && resultCode == RESULT_OK) {
@@ -61,8 +61,8 @@ public class HomePresenterImpl implements HomePageContract.HomePresenter {
             Uri fullPhotoUri = data.getData();
 
             try {
-                 mBitmap = MediaStore.Images.Media.getBitmap(mView.activity().getContentResolver(), fullPhotoUri);
-            // Do work with photo saved at fullPhotoUri
+                mBitmap = MediaStore.Images.Media.getBitmap(mView.activity().getContentResolver(), fullPhotoUri);
+                // Do work with photo saved at fullPhotoUri
                 mView.displayImage(mBitmap);
             } catch (IOException e) {
                 e.printStackTrace();

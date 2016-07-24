@@ -1,4 +1,4 @@
-package com.example.ericliu.photomosaic;
+package com.example.ericliu.photomosaic.ui;
 
 import android.app.Activity;
 import android.content.Intent;
