@@ -35,14 +35,20 @@ public class MosaicView extends View {
     }
 
 
-    public void setImageBitmap(Bitmap bm) {
-        bmBaseLayer = bm;
+    public void setImageBitmap(final Bitmap bm) {
+        post(new Runnable() {
+            @Override
+            public void run() {
+                bmBaseLayer = Bitmap.createScaledBitmap(bm, getWidth(), getHeight(), false);
+            }
+        });
         invalidate();
     }
 
-    public void drawMosaic(){
+    public Bitmap drawMosaic() {
         bmBaseLayer = getGridMosaic();
         invalidate();
+        return bmBaseLayer;
     }
 
 

@@ -69,4 +69,9 @@ public class HomePresenterImpl implements HomePageContract.HomePresenter {
             }
         }
     }
+
+    @Override
+    public void refreshBitmap(Bitmap mosaicBitmap) {
+        mBitmap = mosaicBitmap;
+    }
 }

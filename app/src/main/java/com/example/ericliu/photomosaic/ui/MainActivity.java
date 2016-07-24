@@ -54,7 +54,8 @@ public class MainActivity extends AppCompatActivity implements HomePageContract.
         btnMosaic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ivMain.drawMosaic();
+                Bitmap mosaicBitmap = ivMain.drawMosaic();
+                mHomePresenter.refreshBitmap(mosaicBitmap);
             }
         });
         ivMain = (MosaicView) findViewById(R.id.ivMain);

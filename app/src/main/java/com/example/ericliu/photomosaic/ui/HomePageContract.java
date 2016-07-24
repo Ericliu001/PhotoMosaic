@@ -25,6 +25,8 @@ public interface HomePageContract {
         void onPickPhotoButtonClicked(android.view.View view);
 
         void onActivityResult(int requestCode, int resultCode, Intent data);
+
+        void refreshBitmap(Bitmap mosaicBitmap);
     }
 
 
