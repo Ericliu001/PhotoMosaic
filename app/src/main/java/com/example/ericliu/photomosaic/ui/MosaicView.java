@@ -18,6 +18,10 @@ public class MosaicView extends View {
     private Bitmap bmBaseLayer;
     private int mGridWidth = 32;
 
+
+    private int mImageWidth;
+    private int mImageHeight;
+
     public MosaicView(Context context) {
         super(context);
     }
@@ -34,15 +38,28 @@ public class MosaicView extends View {
         }
     }
 
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        if (mImageWidth == 0 || mImageHeight == 0) {
+            setMeasuredDimension(widthMeasureSpec, heightMeasureSpec);
+        } else {
+            setMeasuredDimension(mImageWidth, mImageHeight);
+        }
+    }
 
     public void setImageBitmap(final Bitmap bm) {
         post(new Runnable() {
             @Override
             public void run() {
-                bmBaseLayer = Bitmap.createScaledBitmap(bm, getWidth(), getHeight(), false);
+                float ratio = bm.getHeight()/(float)bm.getWidth();
+                mImageWidth = getWidth();
+                mImageHeight = Math.round(mImageWidth * ratio);
+
+                bmBaseLayer = Bitmap.createScaledBitmap(bm, mImageWidth, mImageHeight, false);
+                invalidate();
             }
         });
-        invalidate();
     }
 
     public Bitmap drawMosaic() {
