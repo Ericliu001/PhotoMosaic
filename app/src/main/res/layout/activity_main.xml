@@ -30,10 +30,10 @@
             android:layout_toRightOf="@id/btnPickPhoto"
             android:text="Make Mosaic"/>
 
-        <com.example.ericliu.photomosaic.ui.OldMosaicView
+        <com.example.ericliu.photomosaic.ui.MosaicView
             android:id="@+id/ivMain"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_width="200dp"
+            android:layout_height="200dp"
             android:layout_alignParentStart="true"
             android:layout_below="@+id/btnPickPhoto"/>
 

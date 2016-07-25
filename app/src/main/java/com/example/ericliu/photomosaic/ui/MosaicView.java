@@ -14,7 +14,9 @@ import android.view.SurfaceHolder;
 
 public class MosaicView extends SurfaceView implements SurfaceHolder.Callback {
 
-    public enum DrawType{
+    private final SurfaceHolder holder;
+
+    public enum DrawType {
         ORIGINAL_PHOTO, COLOR_MOSAIC;
     }
 
@@ -22,20 +24,26 @@ public class MosaicView extends SurfaceView implements SurfaceHolder.Callback {
 
         private DrawType mDrawType = DrawType.ORIGINAL_PHOTO;
 
-        /** Handle to the surface manager object we interact with */
+        /**
+         * Handle to the surface manager object we interact with
+         */
         private SurfaceHolder mSurfaceHolder;
 
-        /** The drawable to draw the original photo onto canvas */
+        /**
+         * The drawable to draw the original photo onto canvas
+         */
         private Bitmap mOriginalPhoto;
 
         private final Object mRunLock = new Object();
 
-        /** Indicate whether the surface has been created & is ready to draw */
+        /**
+         * Indicate whether the surface has been created & is ready to draw
+         */
         private boolean mRun = false;
 
 
         public MosaicThread(SurfaceHolder surfaceHolder, Context context,
-                            Handler handler){
+                            Handler handler) {
 
             // get handles to some important objects
             mSurfaceHolder = surfaceHolder;
@@ -104,25 +112,48 @@ public class MosaicView extends SurfaceView implements SurfaceHolder.Callback {
     }
 
 
-    /** The thread that actually draws the animation */
+    /**
+     * The thread that actually draws the animation
+     */
     private MosaicThread thread;
 
     public MosaicView(Context context, AttributeSet attrs) {
         super(context, attrs);
 
         // register our interest in hearing about changes to our surface
-        SurfaceHolder holder = getHolder();
+        holder = getHolder();
         holder.addCallback(this);
 
-        // create thread only; it's started in surfaceCreated()
-        thread = new MosaicThread(holder, context, new Handler());
+
+    }
+
+
+    public void resume() {
+        if (thread == null) {
+            thread = new MosaicThread(holder, getContext(), null);
+            thread.setRunning(true);
+            thread.start();
+        }
+    }
+
+    public void pause() {
+
+        thread.setRunning(false);
+
+        boolean retry = true;
+        while (retry) {
+            try {
+                thread.join();
+                thread = null;
+                retry = false;
+            } catch (InterruptedException e) {
+            }
+        }
 
     }
 
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
-        thread.setRunning(true);
-        thread.start();
     }
 
     @Override
@@ -133,16 +164,6 @@ public class MosaicView extends SurfaceView implements SurfaceHolder.Callback {
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
 
-        thread.setRunning(false);
-
-        boolean retry = true;
-        while (retry) {
-            try {
-                thread.join();
-                retry = false;
-            } catch (InterruptedException e) {
-            }
-        }
     }
 
 

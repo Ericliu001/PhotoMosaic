@@ -17,7 +17,7 @@ public class MainActivity extends AppCompatActivity implements HomePageContract.
     private HomePageContract.HomePresenter mHomePresenter;
 
     private Button btnPickPhoto, btnMosaic;
-    private OldMosaicView ivMain;
+    private MosaicView ivMain;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,11 +54,12 @@ public class MainActivity extends AppCompatActivity implements HomePageContract.
         btnMosaic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Bitmap mosaicBitmap = ivMain.drawMosaic();
-                mHomePresenter.refreshBitmap(mosaicBitmap);
+                // TODO: 25/07/2016  adds logic to draw mosaic
+//                Bitmap mosaicBitmap = ivMain.drawMosaic();
+//                mHomePresenter.refreshBitmap(mosaicBitmap);
             }
         });
-        ivMain = (OldMosaicView) findViewById(R.id.ivMain);
+        ivMain = (MosaicView) findViewById(R.id.ivMain);
     }
 
 
@@ -70,6 +71,18 @@ public class MainActivity extends AppCompatActivity implements HomePageContract.
         homePresenter.onViewCreated(isConfigurationChange);
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        ivMain.resume();
+        mHomePresenter.onViewResumed();
+    }
+
+    @Override
+    protected void onPause() {
+        ivMain.pause();
+        super.onPause();
+    }
 
     @Override
     protected void onDestroy() {
@@ -91,6 +104,9 @@ public class MainActivity extends AppCompatActivity implements HomePageContract.
 
     @Override
     public void displayImage(Bitmap bitmap) {
-        ivMain.setImageBitmap(bitmap);
+        MosaicView.MosaicThread thread = ivMain.getThread();
+        if (thread != null) {
+            thread.setOriginalPhoto(bitmap);
+        }
     }
 }

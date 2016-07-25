@@ -62,8 +62,6 @@ public class HomePresenterImpl implements HomePageContract.HomePresenter {
 
             try {
                 mBitmap = MediaStore.Images.Media.getBitmap(mView.activity().getContentResolver(), fullPhotoUri);
-                // Do work with photo saved at fullPhotoUri
-                mView.displayImage(mBitmap);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -73,5 +71,12 @@ public class HomePresenterImpl implements HomePageContract.HomePresenter {
     @Override
     public void refreshBitmap(Bitmap mosaicBitmap) {
         mBitmap = mosaicBitmap;
+    }
+
+    @Override
+    public void onViewResumed() {
+        if (mBitmap != null) {
+            mView.displayImage(mBitmap);
+        }
     }
 }

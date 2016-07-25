@@ -27,6 +27,8 @@ public interface HomePageContract {
         void onActivityResult(int requestCode, int resultCode, Intent data);
 
         void refreshBitmap(Bitmap mosaicBitmap);
+
+        void onViewResumed();
     }
 
 
