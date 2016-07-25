@@ -104,9 +104,6 @@ public class MainActivity extends AppCompatActivity implements HomePageContract.
 
     @Override
     public void displayImage(Bitmap bitmap) {
-        MosaicView.MosaicThread thread = ivMain.getThread();
-        if (thread != null) {
-            thread.setOriginalPhoto(bitmap);
-        }
+        ivMain.setOriginalPhoto(bitmap);
     }
 }

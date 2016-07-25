@@ -18,10 +18,17 @@ public class MosaicView extends SurfaceView implements SurfaceHolder.Callback {
 
     private final SurfaceHolder holder;
     AtomicBoolean render = new AtomicBoolean();
+    private int mImageWidth;
+    private int mImageHeight;
 
     public enum DrawType {
         ORIGINAL_PHOTO, COLOR_MOSAIC;
     }
+
+    /**
+     * The drawable to draw the original photo onto canvas
+     */
+    private Bitmap mOriginalPhoto;
 
     class MosaicThread extends Thread {
 
@@ -32,10 +39,6 @@ public class MosaicView extends SurfaceView implements SurfaceHolder.Callback {
          */
         private SurfaceHolder mSurfaceHolder;
 
-        /**
-         * The drawable to draw the original photo onto canvas
-         */
-        private Bitmap mOriginalPhoto;
 
         private final Object mRunLock = new Object();
 
@@ -111,12 +114,6 @@ public class MosaicView extends SurfaceView implements SurfaceHolder.Callback {
         }
 
 
-
-        public void setOriginalPhoto(Bitmap bitmap) {
-            synchronized (mSurfaceHolder) {
-                mOriginalPhoto = bitmap;
-            }
-        }
     }
 
 
@@ -175,6 +172,16 @@ public class MosaicView extends SurfaceView implements SurfaceHolder.Callback {
         render.set(false);
     }
 
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        if (mImageWidth == 0 || mImageHeight == 0) {
+            setMeasuredDimension(widthMeasureSpec, heightMeasureSpec);
+        } else {
+            setMeasuredDimension(mImageWidth, mImageHeight);
+        }
+    }
+
 
     /**
      * Fetches the animation thread corresponding to this LunarView.
@@ -183,5 +190,20 @@ public class MosaicView extends SurfaceView implements SurfaceHolder.Callback {
      */
     public MosaicThread getThread() {
         return thread;
+    }
+
+    public void setOriginalPhoto(final Bitmap bm) {
+        post(new Runnable() {
+            @Override
+            public void run() {
+                float ratio = bm.getHeight() / (float) bm.getWidth();
+                mImageWidth = getWidth();
+                mImageHeight = Math.round(mImageWidth * ratio);
+
+                mOriginalPhoto = Bitmap.createScaledBitmap(bm, mImageWidth, mImageHeight, false);
+                requestLayout();
+                invalidate();
+            }
+        });
     }
 }
