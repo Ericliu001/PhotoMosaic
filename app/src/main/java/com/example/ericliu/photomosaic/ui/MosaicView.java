@@ -8,6 +8,8 @@ import android.util.AttributeSet;
 import android.view.SurfaceView;
 import android.view.SurfaceHolder;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 /**
  * Created by ericliu on 25/07/2016.
  */
@@ -15,6 +17,7 @@ import android.view.SurfaceHolder;
 public class MosaicView extends SurfaceView implements SurfaceHolder.Callback {
 
     private final SurfaceHolder holder;
+    AtomicBoolean render = new AtomicBoolean();
 
     public enum DrawType {
         ORIGINAL_PHOTO, COLOR_MOSAIC;
@@ -52,6 +55,10 @@ public class MosaicView extends SurfaceView implements SurfaceHolder.Callback {
         @Override
         public void run() {
             while (mRun) {
+                while (!render.get()) {
+                    continue;
+                }
+
                 Canvas c = null;
                 try {
                     c = mSurfaceHolder.lockCanvas(null);
@@ -104,6 +111,7 @@ public class MosaicView extends SurfaceView implements SurfaceHolder.Callback {
         }
 
 
+
         public void setOriginalPhoto(Bitmap bitmap) {
             synchronized (mSurfaceHolder) {
                 mOriginalPhoto = bitmap;
@@ -154,16 +162,17 @@ public class MosaicView extends SurfaceView implements SurfaceHolder.Callback {
 
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
+        render.set(false);
     }
 
     @Override
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-
+        render.compareAndSet(false, true);
     }
 
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
-
+        render.set(false);
     }
 
 
