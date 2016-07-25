@@ -57,6 +57,7 @@ public class MosaicView extends View {
                 mImageHeight = Math.round(mImageWidth * ratio);
 
                 bmBaseLayer = Bitmap.createScaledBitmap(bm, mImageWidth, mImageHeight, false);
+                requestLayout();
                 invalidate();
             }
         });
