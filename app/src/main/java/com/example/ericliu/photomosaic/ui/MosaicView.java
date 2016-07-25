@@ -1,112 +1,71 @@
 package com.example.ericliu.photomosaic.ui;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Paint;
-import android.graphics.Rect;
+import android.os.Handler;
 import android.util.AttributeSet;
-import android.view.View;
-
-import com.example.ericliu.photomosaic.util.BitmapUtils;
+import android.view.SurfaceView;
+import android.view.SurfaceHolder;
 
 /**
- * Created by ericliu on 24/07/2016.
+ * Created by ericliu on 25/07/2016.
  */
 
-public class MosaicView extends View {
-    private Bitmap bmBaseLayer;
-    private int mGridWidth = 32;
+public class MosaicView extends SurfaceView implements SurfaceHolder.Callback {
+    class MosaicThread extends Thread {
+
+        /** Handle to the surface manager object we interact with */
+        private SurfaceHolder mSurfaceHolder;
 
 
-    private int mImageWidth;
-    private int mImageHeight;
+        public MosaicThread(SurfaceHolder surfaceHolder, Context context,
+                            Handler handler){
 
-    public MosaicView(Context context) {
-        super(context);
+            // get handles to some important objects
+            mSurfaceHolder = surfaceHolder;
+        }
+
+        @Override
+        public void run() {
+
+        }
     }
+
+
+    /** The thread that actually draws the animation */
+    private MosaicThread thread;
 
     public MosaicView(Context context, AttributeSet attrs) {
         super(context, attrs);
+
+        // register our interest in hearing about changes to our surface
+        SurfaceHolder holder = getHolder();
+        holder.addCallback(this);
+
+        // create thread only; it's started in surfaceCreated()
+        thread = new MosaicThread(holder, context, new Handler());
+
     }
 
     @Override
-    protected void onDraw(Canvas canvas) {
-        super.onDraw(canvas);
-        if (bmBaseLayer != null) {
-            canvas.drawBitmap(bmBaseLayer, 0, 0, null);
-        }
+    public void surfaceCreated(SurfaceHolder holder) {
+        thread.start();
     }
 
     @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-        if (mImageWidth == 0 || mImageHeight == 0) {
-            setMeasuredDimension(widthMeasureSpec, heightMeasureSpec);
-        } else {
-            setMeasuredDimension(mImageWidth, mImageHeight);
-        }
+    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+
     }
 
-    public void setImageBitmap(final Bitmap bm) {
-        post(new Runnable() {
-            @Override
-            public void run() {
-                float ratio = bm.getHeight()/(float)bm.getWidth();
-                mImageWidth = getWidth();
-                mImageHeight = Math.round(mImageWidth * ratio);
+    @Override
+    public void surfaceDestroyed(SurfaceHolder holder) {
 
-                bmBaseLayer = Bitmap.createScaledBitmap(bm, mImageWidth, mImageHeight, false);
-                requestLayout();
-                invalidate();
-            }
-        });
-    }
-
-    public Bitmap drawMosaic() {
-        bmBaseLayer = getGridMosaic();
-        invalidate();
-        return bmBaseLayer;
-    }
-
-
-    private Bitmap getGridMosaic() {
-        if (bmBaseLayer == null) {
-            return null;
-        }
-
-        int mImageWidth = bmBaseLayer.getWidth();
-        int mImageHeight = bmBaseLayer.getHeight();
-
-        Bitmap bitmap = Bitmap.createBitmap(mImageWidth, mImageHeight,
-                Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(bitmap);
-
-        int horCount = (int) Math.ceil(mImageWidth / (float) mGridWidth);
-        int verCount = (int) Math.ceil(mImageHeight / (float) mGridWidth);
-
-        Paint paint = new Paint();
-        paint.setAntiAlias(true);
-
-        for (int horIndex = 0; horIndex < horCount; ++horIndex) {
-            for (int verIndex = 0; verIndex < verCount; ++verIndex) {
-                int left = mGridWidth * horIndex;
-                int top = mGridWidth * verIndex;
-                int right = left + mGridWidth;
-                if (right > mImageWidth) {
-                    right = mImageWidth;
-                }
-                int bottom = top + mGridWidth;
-                if (bottom > mImageHeight) {
-                    bottom = mImageHeight;
-                }
-                Rect rect = new Rect(left, top, right, bottom);
-                int color = BitmapUtils.getAverageColor(bmBaseLayer, rect);
-                paint.setColor(color);
-                canvas.drawRect(rect, paint);
+        boolean retry = true;
+        while (retry) {
+            try {
+                thread.join();
+                retry = false;
+            } catch (InterruptedException e) {
             }
         }
-        canvas.save();
-        return bitmap;
     }
 }

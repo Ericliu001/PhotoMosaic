@@ -17,7 +17,7 @@ public class MainActivity extends AppCompatActivity implements HomePageContract.
     private HomePageContract.HomePresenter mHomePresenter;
 
     private Button btnPickPhoto, btnMosaic;
-    private MosaicView ivMain;
+    private OldMosaicView ivMain;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,7 +58,7 @@ public class MainActivity extends AppCompatActivity implements HomePageContract.
                 mHomePresenter.refreshBitmap(mosaicBitmap);
             }
         });
-        ivMain = (MosaicView) findViewById(R.id.ivMain);
+        ivMain = (OldMosaicView) findViewById(R.id.ivMain);
     }
 
 
