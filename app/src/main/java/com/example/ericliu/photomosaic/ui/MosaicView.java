@@ -89,8 +89,9 @@ public class MosaicView extends RenderView implements SurfaceHolder.Callback {
                     int color = BitmapUtils.getAverageColor(mBackgroundBitmap, tileRect);
                     Paint paint = new Paint();
                     paint.setColor(color);
-                    canvas.drawBitmap(tileBitmap, 0, 0, paint);
-                    pairList.add(new Pair<Rect, Bitmap>(tileRect, tileBitmap));
+                    Rect newRect = new Rect(0, 0, tileRect.width(), tileRect.height());
+                    canvas.drawRect(newRect, paint);
+                    pairList.add(new Pair(tileRect, tileBitmap));
                 }
                 return pairList;
 
