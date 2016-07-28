@@ -105,6 +105,6 @@ public class MainActivity extends AppCompatActivity implements HomePageContract.
 
     @Override
     public void displayImage(Bitmap bitmap) {
-        ivMain.setOriginalPhoto(bitmap);
+        ivMain.setBackgroundBitmap(bitmap);
     }
 }
