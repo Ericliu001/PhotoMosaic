@@ -20,6 +20,9 @@ import java.util.concurrent.Callable;
 public class MosaicView extends RenderView implements SurfaceHolder.Callback {
 
 
+    private int mGridWidth = 32;
+    private int mGridHeight = 32;
+
     public MosaicView(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
@@ -65,5 +68,45 @@ public class MosaicView extends RenderView implements SurfaceHolder.Callback {
 
         addTask(callable3);
 
+    }
+
+    public void renderHorizontally(){
+
+
+
+    }
+
+
+    public static Rect[][] getGridRects(Bitmap bitmap, int gridWidth, int gridHeight) {
+        if (bitmap == null) {
+            return null;
+        }
+
+
+        int width = bitmap.getWidth();
+        int height = bitmap.getHeight();
+
+        int horCount = (int) Math.ceil(width / (float) gridWidth);
+        int verCount = (int) Math.ceil(height / (float) gridHeight);
+
+        Rect[][] rects = new Rect[horCount][verCount];
+
+        for (int horIndex = 0; horIndex < horCount; ++horIndex) {
+            for (int verIndex = 0; verIndex < verCount; ++verIndex) {
+                int left = gridWidth * horIndex;
+                int top = gridHeight * verIndex;
+                int right = left + gridWidth;
+                if (right > width) {
+                    right = width;
+                }
+                int bottom = top + gridHeight;
+                if (bottom > height) {
+                    bottom = height;
+                }
+                rects[horIndex][verIndex] = new Rect(left, top, right, bottom);
+
+            }
+        }
+        return rects;
     }
 }
