@@ -16,7 +16,7 @@
 
         <Button
             android:id="@+id/btnPickPhoto"
-            android:layout_width="80dp"
+            android:layout_width="100dp"
             android:layout_height="65dp"
             android:text="Pick Photo"
             tools:layout_editor_absoluteX="0dp"
@@ -25,7 +25,7 @@
 
         <Button
         android:id="@+id/btnMosaicVertical"
-        android:layout_width="80dp"
+        android:layout_width="100dp"
         android:layout_height="65dp"
         android:layout_toRightOf="@id/btnPickPhoto"
         android:text="Vertical"/>
@@ -33,10 +33,17 @@
 
         <Button
             android:id="@+id/btnMosaicHorizontal"
-            android:layout_width="80dp"
+            android:layout_width="100dp"
             android:layout_height="65dp"
             android:layout_toRightOf="@id/btnMosaicVertical"
             android:text="Horizontal"/>
+
+        <Button
+            android:id="@+id/btnClear"
+            android:layout_width="80dp"
+            android:layout_height="65dp"
+            android:layout_toRightOf="@id/btnMosaicHorizontal"
+            android:text="Clear"/>
 
         <com.example.ericliu.photomosaic.ui.MosaicView
             android:id="@+id/ivMain"

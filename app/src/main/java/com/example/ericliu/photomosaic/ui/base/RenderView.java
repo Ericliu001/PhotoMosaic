@@ -26,7 +26,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class RenderView extends SurfaceView implements SurfaceHolder.Callback {
 
-    private static final int NUM_OF_FUTURES_PER_FRAME = 10;
+    private static final int NUM_OF_FUTURES_PER_FRAME = 5;
     private final BlockingDeque<Future<Pair<Rect, Bitmap>>> mDrawingQueue = new LinkedBlockingDeque<>();
     private final SurfaceHolder holder;
     private AtomicBoolean render = new AtomicBoolean();
@@ -249,6 +249,15 @@ public class RenderView extends SurfaceView implements SurfaceHolder.Callback {
 
                 }
             });
+        }
+    }
+
+
+    public void clearEffects() {
+        cancelAllTasks();
+        synchronized (holder) {
+            Bitmap.Config conf = Bitmap.Config.ARGB_8888; // see other conf types
+            mDrawingLayerBitmap = Bitmap.createBitmap(mImageWidth, mImageHeight, conf);
         }
     }
 
