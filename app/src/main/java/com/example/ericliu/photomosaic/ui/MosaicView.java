@@ -3,13 +3,17 @@ package com.example.ericliu.photomosaic.ui;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.graphics.Rect;
+import android.support.annotation.NonNull;
 import android.util.AttributeSet;
 import android.util.Pair;
 import android.view.SurfaceHolder;
 
 import com.example.ericliu.photomosaic.R;
 import com.example.ericliu.photomosaic.ui.base.RenderView;
+import com.example.ericliu.photomosaic.util.BitmapUtils;
 
 import java.util.concurrent.Callable;
 
@@ -70,10 +74,41 @@ public class MosaicView extends RenderView implements SurfaceHolder.Callback {
 
     }
 
-    public void renderHorizontally(){
+    public void renderVertically() {
+        Rect[][] rects = getGridRects(mBackgroundBitmap, mGridWidth, mGridHeight);
+        for (int horIndex = 0; horIndex < rects.length; horIndex++) {
+            Callable<Pair<Rect, Bitmap>> callable = startRenderTaskVertically(rects[horIndex]);
+            addTask(callable);
+        }
 
+    }
 
+    private Callable<Pair<Rect, Bitmap>> startRenderTaskVertically(@NonNull final Rect[] rects) {
+        if (rects.length < 1) {
+            return null;
+        }
+        return new Callable<Pair<Rect, Bitmap>>() {
+            @Override
+            public Pair<Rect, Bitmap> call() throws Exception {
 
+                int top = 0;
+                int bottom = mDrawingLayerBitmap.getHeight();
+                int left = rects[0].left;
+                int right = rects[0].right;
+
+                Bitmap rowBitmap = Bitmap.createBitmap(mGridWidth, mDrawingLayerBitmap.getHeight(), Bitmap.Config.ARGB_8888);
+                Rect rowRect = new Rect(left, top, right, bottom);
+                Canvas canvas = new Canvas(rowBitmap);
+
+                for (Rect tileRect : rects) {
+                    int color = BitmapUtils.getAverageColor(mBackgroundBitmap, tileRect);
+                    Paint paint = new Paint();
+                    paint.setColor(color);
+                    canvas.drawBitmap(rowBitmap, 0, tileRect.top, paint);
+                }
+                return new Pair<>(rowRect, rowBitmap);
+            }
+        };
     }
 
 

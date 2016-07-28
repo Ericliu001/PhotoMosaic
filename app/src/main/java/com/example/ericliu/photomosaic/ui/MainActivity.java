@@ -57,7 +57,9 @@ public class MainActivity extends AppCompatActivity implements HomePageContract.
                 // TODO: 25/07/2016  adds logic to draw mosaic
 //                Bitmap mosaicBitmap = ivMain.drawMosaic();
 //                mHomePresenter.refreshBitmap(mosaicBitmap);
-                ivMain.addSomeFutures();
+//                ivMain.addSomeFutures();
+
+                ivMain.renderVertically();
             }
         });
         ivMain = (MosaicView) findViewById(R.id.ivMain);
