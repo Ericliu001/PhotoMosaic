@@ -62,8 +62,10 @@ public class MosaicView extends SurfaceView implements SurfaceHolder.Callback {
                     continue;
                 }
 
+
                 Canvas c = null;
                 try {
+                    Thread.sleep(100);
                     c = mSurfaceHolder.lockCanvas(null);
                     synchronized (mSurfaceHolder) {
                         // Critical section. Do not allow mRun to be set false until
@@ -74,6 +76,8 @@ public class MosaicView extends SurfaceView implements SurfaceHolder.Callback {
                             if (mRun) doDraw(c);
                         }
                     }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 } finally {
                     // do this in a finally so that if an exception is thrown
                     // during the above, we don't leave the Surface in an
