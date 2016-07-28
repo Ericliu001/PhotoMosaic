@@ -26,7 +26,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class RenderView extends SurfaceView implements SurfaceHolder.Callback {
 
-    private static final int NUM_OF_FUTURES_PER_FRAME = 5;
+    private static final int NUM_OF_FUTURES_PER_FRAME = 10;
     private final BlockingDeque<Future<Pair<Rect, Bitmap>>> mDrawingQueue = new LinkedBlockingDeque<>();
     private final SurfaceHolder holder;
     private AtomicBoolean render = new AtomicBoolean();
@@ -71,7 +71,7 @@ public class RenderView extends SurfaceView implements SurfaceHolder.Callback {
 
                 Canvas c = null;
                 try {
-                    Thread.sleep(100);
+                    Thread.sleep(200);
                     c = mSurfaceHolder.lockCanvas(null);
                     synchronized (mSurfaceHolder) {
                         // Critical section. Do not allow mRun to be set false until
