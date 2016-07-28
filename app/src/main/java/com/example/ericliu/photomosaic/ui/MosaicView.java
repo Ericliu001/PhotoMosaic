@@ -2,16 +2,22 @@ package com.example.ericliu.photomosaic.ui;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Rect;
+import android.os.AsyncTask;
 import android.os.Handler;
 import android.util.AttributeSet;
 import android.util.Pair;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
+import com.example.ericliu.photomosaic.R;
+
 import java.util.concurrent.BlockingDeque;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -106,7 +112,7 @@ public class MosaicView extends SurfaceView implements SurfaceHolder.Callback {
             canvas.drawBitmap(mOriginalPhoto, 0, 0, null);
 
             if (mDrawingLayer != null) {
-                canvas.setBitmap(mDrawingLayer);
+                Canvas canvas1 = new Canvas(mDrawingLayer);
 
                 if (!mDrawingQueue.isEmpty()) {
                     Future<Pair<Rect, Bitmap>> future = mDrawingQueue.takeFirst();
@@ -114,7 +120,7 @@ public class MosaicView extends SurfaceView implements SurfaceHolder.Callback {
                     if (rectBitmapPair != null && rectBitmapPair.first != null && rectBitmapPair.second != null) {
                         Rect rect = rectBitmapPair.first;
                         Bitmap bitmap = rectBitmapPair.second;
-                        canvas.drawBitmap(bitmap, null, rect, null);
+                        canvas1.drawBitmap(bitmap, null, rect, null);
                     }
                 }
                 canvas.drawBitmap(mDrawingLayer, 0, 0, null);
@@ -229,6 +235,33 @@ public class MosaicView extends SurfaceView implements SurfaceHolder.Callback {
             mDrawingLayer = Bitmap.createBitmap(mImageWidth, mImageHeight, conf);
             requestLayout();
             invalidate();
+
+            addSomeFutures();
+
+        }
+    }
+
+
+    private void addSomeFutures(){
+        // TODO: 28/07/2016 to be removed
+
+        Callable<Pair<Rect, Bitmap>> callable = new Callable<Pair<Rect, Bitmap>>() {
+            @Override
+            public Pair<Rect, Bitmap> call() throws Exception {
+                Rect rect = new Rect(0, 0, 150, 150);
+                Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.btn_check_off_selected);
+                final Pair<Rect, Bitmap> pair = new Pair<>(rect, bitmap);
+                return pair;
+            }
+        };
+
+        ExecutorService executorService = (ExecutorService) AsyncTask.THREAD_POOL_EXECUTOR;
+        Future<Pair<Rect, Bitmap>> future = executorService.submit(callable);
+
+        try {
+            mDrawingQueue.putLast(future);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 }
