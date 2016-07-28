@@ -75,10 +75,18 @@ public class MosaicView extends RenderView implements SurfaceHolder.Callback {
     }
 
     public void renderVertically() {
+        if (mBackgroundBitmap == null && mDrawingLayerBitmap != null) {
+            return;
+        }
+
         Rect[][] rects = getGridRects(mBackgroundBitmap, mGridWidth, mGridHeight);
-        for (int horIndex = 0; horIndex < rects.length; horIndex++) {
-            Callable<Pair<Rect, Bitmap>> callable = startRenderTaskVertically(rects[horIndex]);
-            addTask(callable);
+
+        if (rects != null) {
+
+            for (int horIndex = 0; horIndex < rects.length; horIndex++) {
+                Callable<Pair<Rect, Bitmap>> callable = startRenderTaskVertically(rects[horIndex]);
+                addTask(callable);
+            }
         }
 
     }
@@ -96,7 +104,7 @@ public class MosaicView extends RenderView implements SurfaceHolder.Callback {
                 int left = rects[0].left;
                 int right = rects[0].right;
 
-                Bitmap rowBitmap = Bitmap.createBitmap(mGridWidth, mDrawingLayerBitmap.getHeight(), Bitmap.Config.ARGB_8888);
+                Bitmap rowBitmap = Bitmap.createBitmap(right - left, mDrawingLayerBitmap.getHeight(), Bitmap.Config.ARGB_8888);
                 Rect rowRect = new Rect(left, top, right, bottom);
                 Canvas canvas = new Canvas(rowBitmap);
 
@@ -104,7 +112,9 @@ public class MosaicView extends RenderView implements SurfaceHolder.Callback {
                     int color = BitmapUtils.getAverageColor(mBackgroundBitmap, tileRect);
                     Paint paint = new Paint();
                     paint.setColor(color);
-                    canvas.drawBitmap(rowBitmap, 0, tileRect.top, paint);
+
+                    Rect newRect = new Rect(0, tileRect.top, tileRect.right - tileRect.left, tileRect.bottom);
+                    canvas.drawRect(newRect, paint);
                 }
                 return new Pair<>(rowRect, rowBitmap);
             }
