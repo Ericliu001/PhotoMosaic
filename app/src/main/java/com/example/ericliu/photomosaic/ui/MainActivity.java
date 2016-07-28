@@ -88,6 +88,7 @@ public class MainActivity extends AppCompatActivity implements HomePageContract.
     @Override
     protected void onDestroy() {
         mHomePresenter.onViewDestroyed();
+        ivMain.cancelAllTasks();
         super.onDestroy();
     }
 

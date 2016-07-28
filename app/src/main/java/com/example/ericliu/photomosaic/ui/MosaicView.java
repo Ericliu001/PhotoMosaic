@@ -30,14 +30,40 @@ public class MosaicView extends RenderView implements SurfaceHolder.Callback {
         Callable<Pair<Rect, Bitmap>> callable = new Callable<Pair<Rect, Bitmap>>() {
             @Override
             public Pair<Rect, Bitmap> call() throws Exception {
-                Thread.sleep(2000);
-                Rect rect = new Rect(0, 0, 150, 150);
+                Thread.sleep(1000);
+                Rect rect = new Rect(0, 0, 100, 100);
                 Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.btn_check_off_selected);
                 final Pair<Rect, Bitmap> pair = new Pair<>(rect, bitmap);
                 return pair;
             }
         };
         addTask(callable);
+
+        Callable<Pair<Rect, Bitmap>> callable2 = new Callable<Pair<Rect, Bitmap>>() {
+            @Override
+            public Pair<Rect, Bitmap> call() throws Exception {
+                Thread.sleep(2000);
+                Rect rect = new Rect(100, 0, 200, 100);
+                Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.btn_check_off_selected);
+                final Pair<Rect, Bitmap> pair = new Pair<>(rect, bitmap);
+                return pair;
+            }
+        };
+
+        addTask(callable2);
+
+        Callable<Pair<Rect, Bitmap>> callable3 = new Callable<Pair<Rect, Bitmap>>() {
+            @Override
+            public Pair<Rect, Bitmap> call() throws Exception {
+                Thread.sleep(3000);
+                Rect rect = new Rect(200, 0, 300, 100);
+                Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.btn_check_off_selected);
+                final Pair<Rect, Bitmap> pair = new Pair<>(rect, bitmap);
+                return pair;
+            }
+        };
+
+        addTask(callable3);
 
     }
 }
