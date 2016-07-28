@@ -84,19 +84,24 @@ public class MosaicView extends RenderView implements SurfaceHolder.Callback {
                 List<Pair<Rect, Bitmap>> pairList = new ArrayList<>();
 
                 for (Rect tileRect : rowArray) {
-                    Bitmap tileBitmap = Bitmap.createBitmap(tileRect.width(), tileRect.height(), Bitmap.Config.ARGB_8888);
-                    Canvas canvas = new Canvas(tileBitmap);
-                    int color = BitmapUtils.getAverageColor(mBackgroundBitmap, tileRect);
-                    Paint paint = new Paint();
-                    paint.setColor(color);
-                    Rect newRect = new Rect(0, 0, tileRect.width(), tileRect.height());
-                    canvas.drawRect(newRect, paint);
+                    Bitmap tileBitmap = createTile(tileRect);
                     pairList.add(new Pair(tileRect, tileBitmap));
                 }
                 return pairList;
 
             }
         };
+    }
+
+    private Bitmap createTile(Rect tileRect) {
+        Bitmap tileBitmap = Bitmap.createBitmap(tileRect.width(), tileRect.height(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(tileBitmap);
+        int color = BitmapUtils.getAverageColor(mBackgroundBitmap, tileRect);
+        Paint paint = new Paint();
+        paint.setColor(color);
+        Rect newRect = new Rect(0, 0, tileRect.width(), tileRect.height());
+        canvas.drawRect(newRect, paint);
+        return tileBitmap;
     }
 
     private void renderVertically(Rect[][] rects) {
