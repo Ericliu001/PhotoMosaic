@@ -16,7 +16,7 @@ public class MainActivity extends AppCompatActivity implements HomePageContract.
     private static final String TAG = MainActivity.class.getSimpleName();
     private HomePageContract.HomePresenter mHomePresenter;
 
-    private Button btnPickPhoto, btnMosaic;
+    private Button btnPickPhoto, btnMosaicVertical, btnMosaicHorizontal;
     private MosaicView ivMain;
 
     @Override
@@ -50,8 +50,8 @@ public class MainActivity extends AppCompatActivity implements HomePageContract.
             }
         });
 
-        btnMosaic = (Button) findViewById(R.id.btnMosaic);
-        btnMosaic.setOnClickListener(new View.OnClickListener() {
+        btnMosaicVertical = (Button) findViewById(R.id.btnMosaicVertical);
+        btnMosaicVertical.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // TODO: 25/07/2016  adds logic to draw mosaic
@@ -62,6 +62,16 @@ public class MainActivity extends AppCompatActivity implements HomePageContract.
                 ivMain.renderMosaic(MosaicView.RenderDirection.VERTICAL);
             }
         });
+
+
+        btnMosaicHorizontal = (Button) findViewById(R.id.btnMosaicHorizontal);
+        btnMosaicHorizontal.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ivMain.renderMosaic(MosaicView.RenderDirection.HORIZONTAL);
+            }
+        });
+
         ivMain = (MosaicView) findViewById(R.id.ivMain);
     }
 

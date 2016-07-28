@@ -45,7 +45,7 @@ public class MosaicView extends RenderView implements SurfaceHolder.Callback {
         }
 
         if (direction == RenderDirection.HORIZONTAL) {
-
+            renderHorizontally(rects);
 
         } else if (direction == RenderDirection.VERTICAL) {
             renderVertically(rects);
@@ -53,6 +53,55 @@ public class MosaicView extends RenderView implements SurfaceHolder.Callback {
 
     }
 
+
+    private void renderHorizontally(Rect[][] rects) {
+        if (rects.length > 0) {
+
+            for (int verIndex = 0; verIndex < rects[0].length; verIndex++) {
+                Rect[] rowArray = new Rect[rects.length];
+                for (int horIndex = 0; horIndex < rects.length; horIndex++) {
+                    rowArray[horIndex] = rects[horIndex][verIndex];
+                }
+
+                Callable<Pair<Rect, Bitmap>> callable = startRenderTaskHorizontally(rowArray);
+                addTask(callable);
+
+            }
+        }
+    }
+
+
+    private Callable<Pair<Rect, Bitmap>> startRenderTaskHorizontally(final Rect[] rowArray) {
+        if (rowArray.length < 1) {
+            return null;
+        }
+
+        return new Callable<Pair<Rect, Bitmap>>() {
+            @Override
+            public Pair<Rect, Bitmap> call() throws Exception {
+
+                int top = rowArray[0].top;
+                int bottom = rowArray[0].bottom;
+                int left = 0;
+                int right = mDrawingLayerBitmap.getWidth();
+
+                Bitmap rowBitmap = Bitmap.createBitmap(mDrawingLayerBitmap.getWidth(), bottom - top, Bitmap.Config.ARGB_8888);
+                Rect rowRect = new Rect(left, top, right, bottom);
+                Canvas canvas = new Canvas(rowBitmap);
+
+                for (Rect tileRect : rowArray) {
+                    int color = BitmapUtils.getAverageColor(mBackgroundBitmap, tileRect);
+                    Paint paint = new Paint();
+                    paint.setColor(color);
+
+                    Rect newRect = new Rect(tileRect.left, 0, tileRect.right, tileRect.bottom - tileRect.top);
+                    canvas.drawRect(newRect, paint);
+                }
+                return new Pair<>(rowRect, rowBitmap);
+
+            }
+        };
+    }
 
     private void renderVertically(Rect[][] rects) {
 
@@ -75,9 +124,9 @@ public class MosaicView extends RenderView implements SurfaceHolder.Callback {
                 int left = rects[0].left;
                 int right = rects[0].right;
 
-                Bitmap rowBitmap = Bitmap.createBitmap(right - left, mDrawingLayerBitmap.getHeight(), Bitmap.Config.ARGB_8888);
+                Bitmap columnBitmap = Bitmap.createBitmap(right - left, mDrawingLayerBitmap.getHeight(), Bitmap.Config.ARGB_8888);
                 Rect rowRect = new Rect(left, top, right, bottom);
-                Canvas canvas = new Canvas(rowBitmap);
+                Canvas canvas = new Canvas(columnBitmap);
 
                 for (Rect tileRect : rects) {
                     int color = BitmapUtils.getAverageColor(mBackgroundBitmap, tileRect);
@@ -87,7 +136,7 @@ public class MosaicView extends RenderView implements SurfaceHolder.Callback {
                     Rect newRect = new Rect(0, tileRect.top, tileRect.right - tileRect.left, tileRect.bottom);
                     canvas.drawRect(newRect, paint);
                 }
-                return new Pair<>(rowRect, rowBitmap);
+                return new Pair<>(rowRect, columnBitmap);
             }
         };
     }
