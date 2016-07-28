@@ -17,7 +17,7 @@ public class MainActivity extends AppCompatActivity implements HomePageContract.
     private HomePageContract.HomePresenter mHomePresenter;
 
     private Button btnPickPhoto, btnMosaicVertical, btnMosaicHorizontal, btnClear;
-    private MosaicView ivMain;
+    private TileView ivMain;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,7 +59,7 @@ public class MainActivity extends AppCompatActivity implements HomePageContract.
 //                mHomePresenter.refreshBitmap(mosaicBitmap);
 //                ivMain.addSomeFutures();
 
-                ivMain.renderMosaic(MosaicView.RenderDirection.VERTICAL);
+                ivMain.renderTiles(TileView.RenderDirection.VERTICAL);
             }
         });
 
@@ -68,7 +68,7 @@ public class MainActivity extends AppCompatActivity implements HomePageContract.
         btnMosaicHorizontal.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ivMain.renderMosaic(MosaicView.RenderDirection.HORIZONTAL);
+                ivMain.renderTiles(TileView.RenderDirection.HORIZONTAL);
             }
         });
 
@@ -80,7 +80,7 @@ public class MainActivity extends AppCompatActivity implements HomePageContract.
             }
         });
 
-        ivMain = (MosaicView) findViewById(R.id.ivMain);
+        ivMain = (TileView) findViewById(R.id.ivMain);
     }
 
 

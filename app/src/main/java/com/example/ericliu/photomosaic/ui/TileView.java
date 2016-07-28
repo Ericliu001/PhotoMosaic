@@ -2,15 +2,13 @@ package com.example.ericliu.photomosaic.ui;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Paint;
 import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.util.Pair;
 import android.view.SurfaceHolder;
 
 import com.example.ericliu.photomosaic.ui.base.RenderView;
-import com.example.ericliu.photomosaic.util.BitmapUtils;
+import com.example.ericliu.photomosaic.ui.filter.MosaicFilter;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -21,7 +19,7 @@ import java.util.concurrent.Callable;
  * Created by ericliu on 25/07/2016.
  */
 
-public class MosaicView extends RenderView implements SurfaceHolder.Callback {
+public class TileView extends RenderView implements SurfaceHolder.Callback {
 
 
     private int mGridWidth = 32;
@@ -31,12 +29,12 @@ public class MosaicView extends RenderView implements SurfaceHolder.Callback {
         HORIZONTAL, VERTICAL;
     }
 
-    public MosaicView(Context context, AttributeSet attrs) {
+    public TileView(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
 
-    public void renderMosaic(RenderDirection direction) {
+    public void renderTiles(RenderDirection direction) {
         if (mBackgroundBitmap == null && mDrawingLayerBitmap != null) {
             return;
         }
@@ -73,36 +71,6 @@ public class MosaicView extends RenderView implements SurfaceHolder.Callback {
     }
 
 
-    private Callable<Collection<Pair<Rect, Bitmap>>> startRenderTask(final Rect[] rowArray) {
-        if (rowArray.length < 1) {
-            return null;
-        }
-
-        return new Callable<Collection<Pair<Rect, Bitmap>>>() {
-            @Override
-            public Collection<Pair<Rect, Bitmap>> call() throws Exception {
-                List<Pair<Rect, Bitmap>> pairList = new ArrayList<>();
-
-                for (Rect tileRect : rowArray) {
-                    Bitmap tileBitmap = createTile(tileRect);
-                    pairList.add(new Pair(tileRect, tileBitmap));
-                }
-                return pairList;
-
-            }
-        };
-    }
-
-    private Bitmap createTile(Rect tileRect) {
-        Bitmap tileBitmap = Bitmap.createBitmap(tileRect.width(), tileRect.height(), Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(tileBitmap);
-        int color = BitmapUtils.getAverageColor(mBackgroundBitmap, tileRect);
-        Paint paint = new Paint();
-        paint.setColor(color);
-        Rect newRect = new Rect(0, 0, tileRect.width(), tileRect.height());
-        canvas.drawRect(newRect, paint);
-        return tileBitmap;
-    }
 
     private void renderVertically(Rect[][] rects) {
 
@@ -112,6 +80,25 @@ public class MosaicView extends RenderView implements SurfaceHolder.Callback {
         }
     }
 
+    private Callable<Collection<Pair<Rect, Bitmap>>> startRenderTask(final Rect[] rectArray) {
+        if (rectArray.length < 1) {
+            return null;
+        }
+
+        return new Callable<Collection<Pair<Rect, Bitmap>>>() {
+            @Override
+            public Collection<Pair<Rect, Bitmap>> call() throws Exception {
+                List<Pair<Rect, Bitmap>> pairList = new ArrayList<>();
+
+                for (Rect tileRect : rectArray) {
+                    Bitmap tileBitmap = MosaicFilter.createTile(tileRect, mBackgroundBitmap);
+                    pairList.add(new Pair(tileRect, tileBitmap));
+                }
+                return pairList;
+
+            }
+        };
+    }
 
 
 
