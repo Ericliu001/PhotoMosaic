@@ -3,11 +3,17 @@ package com.example.ericliu.photomosaic.ui;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Rect;
 import android.os.Handler;
 import android.util.AttributeSet;
-import android.view.SurfaceView;
+import android.util.Pair;
 import android.view.SurfaceHolder;
+import android.view.SurfaceView;
 
+import java.util.concurrent.BlockingDeque;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -16,23 +22,20 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class MosaicView extends SurfaceView implements SurfaceHolder.Callback {
 
+
+    public static final BlockingDeque<Future<Pair<Rect, Bitmap>>> mDrawingQueue = new LinkedBlockingDeque<>();
     private final SurfaceHolder holder;
-    AtomicBoolean render = new AtomicBoolean();
+    private AtomicBoolean render = new AtomicBoolean();
     private int mImageWidth;
     private int mImageHeight;
-
-    public enum DrawType {
-        ORIGINAL_PHOTO, COLOR_MOSAIC;
-    }
-
     /**
      * The drawable to draw the original photo onto canvas
      */
     private Bitmap mOriginalPhoto;
 
+
     class MosaicThread extends Thread {
 
-        private DrawType mDrawType = DrawType.ORIGINAL_PHOTO;
 
         /**
          * Handle to the surface manager object we interact with
@@ -78,6 +81,8 @@ public class MosaicView extends SurfaceView implements SurfaceHolder.Callback {
                     }
                 } catch (InterruptedException e) {
                     e.printStackTrace();
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
                 } finally {
                     // do this in a finally so that if an exception is thrown
                     // during the above, we don't leave the Surface in an
@@ -94,9 +99,20 @@ public class MosaicView extends SurfaceView implements SurfaceHolder.Callback {
          * Draws the photo to the provided
          * Canvas.
          */
-        private void doDraw(Canvas canvas) {
-            if (mDrawType == DrawType.ORIGINAL_PHOTO && mOriginalPhoto != null) {
-                canvas.drawBitmap(mOriginalPhoto, 0, 0, null);
+        private void doDraw(Canvas canvas) throws InterruptedException, ExecutionException {
+            if (mOriginalPhoto == null) {
+                return;
+            }
+            canvas.drawBitmap(mOriginalPhoto, 0, 0, null);
+
+            if (!mDrawingQueue.isEmpty()) {
+                Future<Pair<Rect, Bitmap>> future = mDrawingQueue.takeFirst();
+                Pair<Rect, Bitmap> rectBitmapPair = future.get();
+                if (rectBitmapPair != null && rectBitmapPair.first != null && rectBitmapPair.second != null) {
+                    Rect rect = rectBitmapPair.first;
+                    Bitmap bitmap = rectBitmapPair.second;
+                    canvas.drawBitmap(bitmap, null, rect, null);
+                }
             }
         }
 
@@ -197,17 +213,15 @@ public class MosaicView extends SurfaceView implements SurfaceHolder.Callback {
     }
 
     public void setOriginalPhoto(final Bitmap bm) {
-        post(new Runnable() {
-            @Override
-            public void run() {
-                float ratio = bm.getHeight() / (float) bm.getWidth();
-                mImageWidth = getWidth();
-                mImageHeight = Math.round(mImageWidth * ratio);
+        synchronized (holder) {
 
-                mOriginalPhoto = Bitmap.createScaledBitmap(bm, mImageWidth, mImageHeight, false);
-                requestLayout();
-                invalidate();
-            }
-        });
+            float ratio = bm.getHeight() / (float) bm.getWidth();
+            mImageWidth = getWidth();
+            mImageHeight = Math.round(mImageWidth * ratio);
+
+            mOriginalPhoto = Bitmap.createScaledBitmap(bm, mImageWidth, mImageHeight, false);
+            requestLayout();
+            invalidate();
+        }
     }
 }
