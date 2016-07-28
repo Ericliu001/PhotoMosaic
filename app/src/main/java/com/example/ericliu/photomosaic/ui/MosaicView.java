@@ -32,7 +32,7 @@ public class MosaicView extends SurfaceView implements SurfaceHolder.Callback {
      * The drawable to draw the original photo onto canvas
      */
     private Bitmap mOriginalPhoto;
-
+    private Bitmap mDrawingLayer;
 
     class MosaicThread extends Thread {
 
@@ -105,14 +105,19 @@ public class MosaicView extends SurfaceView implements SurfaceHolder.Callback {
             }
             canvas.drawBitmap(mOriginalPhoto, 0, 0, null);
 
-            if (!mDrawingQueue.isEmpty()) {
-                Future<Pair<Rect, Bitmap>> future = mDrawingQueue.takeFirst();
-                Pair<Rect, Bitmap> rectBitmapPair = future.get();
-                if (rectBitmapPair != null && rectBitmapPair.first != null && rectBitmapPair.second != null) {
-                    Rect rect = rectBitmapPair.first;
-                    Bitmap bitmap = rectBitmapPair.second;
-                    canvas.drawBitmap(bitmap, null, rect, null);
+            if (mDrawingLayer != null) {
+                canvas.setBitmap(mDrawingLayer);
+
+                if (!mDrawingQueue.isEmpty()) {
+                    Future<Pair<Rect, Bitmap>> future = mDrawingQueue.takeFirst();
+                    Pair<Rect, Bitmap> rectBitmapPair = future.get();
+                    if (rectBitmapPair != null && rectBitmapPair.first != null && rectBitmapPair.second != null) {
+                        Rect rect = rectBitmapPair.first;
+                        Bitmap bitmap = rectBitmapPair.second;
+                        canvas.drawBitmap(bitmap, null, rect, null);
+                    }
                 }
+                canvas.drawBitmap(mDrawingLayer, 0, 0, null);
             }
         }
 
@@ -220,6 +225,8 @@ public class MosaicView extends SurfaceView implements SurfaceHolder.Callback {
             mImageHeight = Math.round(mImageWidth * ratio);
 
             mOriginalPhoto = Bitmap.createScaledBitmap(bm, mImageWidth, mImageHeight, false);
+            Bitmap.Config conf = Bitmap.Config.ARGB_8888; // see other conf types
+            mDrawingLayer = Bitmap.createBitmap(mImageWidth, mImageHeight, conf);
             requestLayout();
             invalidate();
         }
