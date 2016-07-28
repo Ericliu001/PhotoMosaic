@@ -5,7 +5,6 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
-import android.support.annotation.NonNull;
 import android.util.AttributeSet;
 import android.util.Pair;
 import android.view.SurfaceHolder;
@@ -13,6 +12,9 @@ import android.view.SurfaceHolder;
 import com.example.ericliu.photomosaic.ui.base.RenderView;
 import com.example.ericliu.photomosaic.util.BitmapUtils;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.Callable;
 
 /**
@@ -63,7 +65,7 @@ public class MosaicView extends RenderView implements SurfaceHolder.Callback {
                     rowArray[horIndex] = rects[horIndex][verIndex];
                 }
 
-                Callable<Pair<Rect, Bitmap>> callable = startRenderTaskHorizontally(rowArray);
+                Callable<Collection<Pair<Rect, Bitmap>>> callable = startRenderTask(rowArray);
                 addTask(callable);
 
             }
@@ -71,33 +73,26 @@ public class MosaicView extends RenderView implements SurfaceHolder.Callback {
     }
 
 
-    private Callable<Pair<Rect, Bitmap>> startRenderTaskHorizontally(final Rect[] rowArray) {
+    private Callable<Collection<Pair<Rect, Bitmap>>> startRenderTask(final Rect[] rowArray) {
         if (rowArray.length < 1) {
             return null;
         }
 
-        return new Callable<Pair<Rect, Bitmap>>() {
+        return new Callable<Collection<Pair<Rect, Bitmap>>>() {
             @Override
-            public Pair<Rect, Bitmap> call() throws Exception {
-
-                int top = rowArray[0].top;
-                int bottom = rowArray[0].bottom;
-                int left = 0;
-                int right = mDrawingLayerBitmap.getWidth();
-
-                Bitmap rowBitmap = Bitmap.createBitmap(mDrawingLayerBitmap.getWidth(), bottom - top, Bitmap.Config.ARGB_8888);
-                Rect rowRect = new Rect(left, top, right, bottom);
-                Canvas canvas = new Canvas(rowBitmap);
+            public Collection<Pair<Rect, Bitmap>> call() throws Exception {
+                List<Pair<Rect, Bitmap>> pairList = new ArrayList<>();
 
                 for (Rect tileRect : rowArray) {
+                    Bitmap tileBitmap = Bitmap.createBitmap(tileRect.width(), tileRect.height(), Bitmap.Config.ARGB_8888);
+                    Canvas canvas = new Canvas(tileBitmap);
                     int color = BitmapUtils.getAverageColor(mBackgroundBitmap, tileRect);
                     Paint paint = new Paint();
                     paint.setColor(color);
-
-                    Rect newRect = new Rect(tileRect.left, 0, tileRect.right, tileRect.bottom - tileRect.top);
-                    canvas.drawRect(newRect, paint);
+                    canvas.drawBitmap(tileBitmap, 0, 0, paint);
+                    pairList.add(new Pair<Rect, Bitmap>(tileRect, tileBitmap));
                 }
-                return new Pair<>(rowRect, rowBitmap);
+                return pairList;
 
             }
         };
@@ -106,40 +101,12 @@ public class MosaicView extends RenderView implements SurfaceHolder.Callback {
     private void renderVertically(Rect[][] rects) {
 
         for (int horIndex = 0; horIndex < rects.length; horIndex++) {
-            Callable<Pair<Rect, Bitmap>> callable = startRenderTaskVertically(rects[horIndex]);
+            Callable<Collection<Pair<Rect, Bitmap>>> callable = startRenderTask(rects[horIndex]);
             addTask(callable);
         }
     }
 
-    private Callable<Pair<Rect, Bitmap>> startRenderTaskVertically(@NonNull final Rect[] rects) {
-        if (rects.length < 1) {
-            return null;
-        }
-        return new Callable<Pair<Rect, Bitmap>>() {
-            @Override
-            public Pair<Rect, Bitmap> call() throws Exception {
 
-                int top = 0;
-                int bottom = mDrawingLayerBitmap.getHeight();
-                int left = rects[0].left;
-                int right = rects[0].right;
-
-                Bitmap columnBitmap = Bitmap.createBitmap(right - left, mDrawingLayerBitmap.getHeight(), Bitmap.Config.ARGB_8888);
-                Rect rowRect = new Rect(left, top, right, bottom);
-                Canvas canvas = new Canvas(columnBitmap);
-
-                for (Rect tileRect : rects) {
-                    int color = BitmapUtils.getAverageColor(mBackgroundBitmap, tileRect);
-                    Paint paint = new Paint();
-                    paint.setColor(color);
-
-                    Rect newRect = new Rect(0, tileRect.top, tileRect.right - tileRect.left, tileRect.bottom);
-                    canvas.drawRect(newRect, paint);
-                }
-                return new Pair<>(rowRect, columnBitmap);
-            }
-        };
-    }
 
 
     public static Rect[][] getGridRects(Bitmap bitmap, int gridWidth, int gridHeight) {

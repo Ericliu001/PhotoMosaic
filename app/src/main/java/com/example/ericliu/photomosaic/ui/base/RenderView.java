@@ -11,6 +11,7 @@ import android.util.Pair;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
+import java.util.Collection;
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
@@ -27,7 +28,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class RenderView extends SurfaceView implements SurfaceHolder.Callback {
 
     private static final int NUM_OF_FUTURES_PER_FRAME = 5;
-    private final BlockingDeque<Future<Pair<Rect, Bitmap>>> mDrawingQueue = new LinkedBlockingDeque<>();
+    private final BlockingDeque<Future<Collection<Pair<Rect, Bitmap>>>> mDrawingQueue = new LinkedBlockingDeque<>();
     private final SurfaceHolder holder;
     private AtomicBoolean render = new AtomicBoolean();
     private int mImageWidth;
@@ -115,12 +116,14 @@ public class RenderView extends SurfaceView implements SurfaceHolder.Callback {
                 int counter = 0;
                 while (!mDrawingQueue.isEmpty() && counter < NUM_OF_FUTURES_PER_FRAME) {
                     try {
-                        Future<Pair<Rect, Bitmap>> future = mDrawingQueue.takeFirst();
-                        Pair<Rect, Bitmap> rectBitmapPair = future.get();
-                        if (rectBitmapPair != null && rectBitmapPair.first != null && rectBitmapPair.second != null) {
-                            Rect rect = rectBitmapPair.first;
-                            Bitmap bitmap = rectBitmapPair.second;
-                            canvasDrawingLayer.drawBitmap(bitmap, null, rect, null);
+                        Future<Collection<Pair<Rect, Bitmap>>> future = mDrawingQueue.takeFirst();
+                        Collection<Pair<Rect, Bitmap>> collection = future.get();
+                        for (Pair<Rect, Bitmap> rectBitmapPair : collection) {
+                            if (rectBitmapPair != null && rectBitmapPair.first != null && rectBitmapPair.second != null) {
+                                Rect rect = rectBitmapPair.first;
+                                Bitmap bitmap = rectBitmapPair.second;
+                                canvasDrawingLayer.drawBitmap(bitmap, null, rect, null);
+                            }
                         }
                     } catch (CancellationException e) {
                         // the Callable is cancelled.
@@ -267,14 +270,14 @@ public class RenderView extends SurfaceView implements SurfaceHolder.Callback {
      *
      * @param callable
      */
-    protected void addTask(Callable<Pair<Rect, Bitmap>> callable) {
-        Future<Pair<Rect, Bitmap>> future = mExecutorService.submit(callable);
+    protected void addTask(Callable<Collection<Pair<Rect, Bitmap>>> callable) {
+        Future<Collection<Pair<Rect, Bitmap>>> future = mExecutorService.submit(callable);
         mDrawingQueue.addLast(future);
     }
 
 
     public void cancelAllTasks() {
-        for (Future<Pair<Rect, Bitmap>> future : mDrawingQueue) {
+        for (Future<Collection<Pair<Rect, Bitmap>>> future : mDrawingQueue) {
             future.cancel(true);
         }
         mDrawingQueue.clear();
