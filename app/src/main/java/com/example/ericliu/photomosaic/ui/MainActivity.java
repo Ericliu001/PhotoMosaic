@@ -59,7 +59,7 @@ public class MainActivity extends AppCompatActivity implements HomePageContract.
 //                mHomePresenter.refreshBitmap(mosaicBitmap);
 //                ivMain.addSomeFutures();
 
-                ivMain.renderVertically();
+                ivMain.renderMosaic(MosaicView.RenderDirection.VERTICAL);
             }
         });
         ivMain = (MosaicView) findViewById(R.id.ivMain);
