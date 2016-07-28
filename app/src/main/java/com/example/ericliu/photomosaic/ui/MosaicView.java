@@ -112,7 +112,7 @@ public class MosaicView extends SurfaceView implements SurfaceHolder.Callback {
             canvas.drawBitmap(mOriginalPhoto, 0, 0, null);
 
             if (mDrawingLayer != null) {
-                Canvas canvas1 = new Canvas(mDrawingLayer);
+                Canvas canvasDrawingLayer = new Canvas(mDrawingLayer);
 
                 if (!mDrawingQueue.isEmpty()) {
                     Future<Pair<Rect, Bitmap>> future = mDrawingQueue.takeFirst();
@@ -120,7 +120,7 @@ public class MosaicView extends SurfaceView implements SurfaceHolder.Callback {
                     if (rectBitmapPair != null && rectBitmapPair.first != null && rectBitmapPair.second != null) {
                         Rect rect = rectBitmapPair.first;
                         Bitmap bitmap = rectBitmapPair.second;
-                        canvas1.drawBitmap(bitmap, null, rect, null);
+                        canvasDrawingLayer.drawBitmap(bitmap, null, rect, null);
                     }
                 }
                 canvas.drawBitmap(mDrawingLayer, 0, 0, null);
@@ -226,23 +226,30 @@ public class MosaicView extends SurfaceView implements SurfaceHolder.Callback {
     public void setOriginalPhoto(final Bitmap bm) {
         synchronized (holder) {
 
-            float ratio = bm.getHeight() / (float) bm.getWidth();
-            mImageWidth = getWidth();
-            mImageHeight = Math.round(mImageWidth * ratio);
+            post(new Runnable() {
+                @Override
+                public void run() {
 
-            mOriginalPhoto = Bitmap.createScaledBitmap(bm, mImageWidth, mImageHeight, false);
-            Bitmap.Config conf = Bitmap.Config.ARGB_8888; // see other conf types
-            mDrawingLayer = Bitmap.createBitmap(mImageWidth, mImageHeight, conf);
-            requestLayout();
-            invalidate();
 
-            addSomeFutures();
+                    float ratio = bm.getHeight() / (float) bm.getWidth();
+                    mImageWidth = getWidth();
+                    mImageHeight = Math.round(mImageWidth * ratio);
 
+                    mOriginalPhoto = Bitmap.createScaledBitmap(bm, mImageWidth, mImageHeight, false);
+                    Bitmap.Config conf = Bitmap.Config.ARGB_8888; // see other conf types
+                    mDrawingLayer = Bitmap.createBitmap(mImageWidth, mImageHeight, conf);
+                    requestLayout();
+                    invalidate();
+
+                    addSomeFutures();
+
+                }
+            });
         }
     }
 
 
-    private void addSomeFutures(){
+    private void addSomeFutures() {
         // TODO: 28/07/2016 to be removed
 
         Callable<Pair<Rect, Bitmap>> callable = new Callable<Pair<Rect, Bitmap>>() {
