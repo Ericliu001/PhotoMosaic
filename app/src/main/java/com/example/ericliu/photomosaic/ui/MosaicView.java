@@ -241,7 +241,6 @@ public class MosaicView extends SurfaceView implements SurfaceHolder.Callback {
                     requestLayout();
                     invalidate();
 
-                    addSomeFutures();
 
                 }
             });
@@ -249,12 +248,13 @@ public class MosaicView extends SurfaceView implements SurfaceHolder.Callback {
     }
 
 
-    private void addSomeFutures() {
+    public void addSomeFutures() {
         // TODO: 28/07/2016 to be removed
 
         Callable<Pair<Rect, Bitmap>> callable = new Callable<Pair<Rect, Bitmap>>() {
             @Override
             public Pair<Rect, Bitmap> call() throws Exception {
+                Thread.sleep(2000);
                 Rect rect = new Rect(0, 0, 150, 150);
                 Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.btn_check_off_selected);
                 final Pair<Rect, Bitmap> pair = new Pair<>(rect, bitmap);
@@ -264,11 +264,7 @@ public class MosaicView extends SurfaceView implements SurfaceHolder.Callback {
 
         ExecutorService executorService = (ExecutorService) AsyncTask.THREAD_POOL_EXECUTOR;
         Future<Pair<Rect, Bitmap>> future = executorService.submit(callable);
+        mDrawingQueue.addLast(future);
 
-        try {
-            mDrawingQueue.putLast(future);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
     }
 }
