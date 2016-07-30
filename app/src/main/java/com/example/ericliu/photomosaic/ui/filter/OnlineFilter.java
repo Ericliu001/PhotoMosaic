@@ -59,5 +59,15 @@ public class OnlineFilter implements ImageFilter {
         return Bitmap.createScaledBitmap(bmp, tileRect.width(), tileRect.height(), false);
     }
 
+    @Override
+    public int getGridHeight() {
+        return 128;
+    }
+
+    @Override
+    public int getGridWidth() {
+        return 128;
+    }
+
 
 }

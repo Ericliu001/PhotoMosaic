@@ -27,7 +27,7 @@ public class TileView extends RenderView implements SurfaceHolder.Callback {
     private int mGridHeight = 32;
 
 
-    private FilterFactory.FilterType mImageFilterType;
+    private ImageFilter mImageFilter;
 
     public enum RenderDirection {
         HORIZONTAL, VERTICAL;
@@ -39,7 +39,10 @@ public class TileView extends RenderView implements SurfaceHolder.Callback {
 
 
     public void setImageFilterType(FilterFactory.FilterType imageFilterType) {
-        mImageFilterType = imageFilterType;
+
+        mImageFilter = FilterFactory.getImageFilter(imageFilterType);
+        mGridHeight = mImageFilter.getGridHeight();
+        mGridWidth = mImageFilter.getGridWidth();
     }
 
     public void renderTiles(RenderDirection direction) {
@@ -98,9 +101,8 @@ public class TileView extends RenderView implements SurfaceHolder.Callback {
                 List<Pair<Rect, Bitmap>> pairList = new ArrayList<>();
 
                 for (Rect tileRect : rectArray) {
-                    ImageFilter imageFilter = FilterFactory.getImageFilter(mImageFilterType);
-                    if (imageFilter != null) {
-                        Bitmap tileBitmap = imageFilter.createTile(tileRect, mBackgroundBitmap);
+                    if (mImageFilter != null) {
+                        Bitmap tileBitmap = mImageFilter.createTile(tileRect, mBackgroundBitmap);
                         pairList.add(new Pair(tileRect, tileBitmap));
                     }
                 }

@@ -10,4 +10,9 @@ import android.graphics.Rect;
 public interface ImageFilter {
 
     Bitmap createTile(Rect tileRect, Bitmap srcBitmap);
+
+
+    int getGridHeight();
+
+    int getGridWidth();
 }

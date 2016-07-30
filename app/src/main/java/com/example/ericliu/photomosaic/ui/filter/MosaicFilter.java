@@ -24,4 +24,14 @@ public class MosaicFilter implements ImageFilter {
         canvas.drawRect(newRect, paint);
         return tileBitmap;
     }
+
+    @Override
+    public int getGridHeight() {
+        return 32;
+    }
+
+    @Override
+    public int getGridWidth() {
+        return 32;
+    }
 }
