@@ -45,12 +45,19 @@
             android:layout_toRightOf="@id/btnMosaicHorizontal"
             android:text="Clear"/>
 
+        <Spinner
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/btnPickPhoto"
+            android:layout_toStartOf="@+id/btnClear"
+            android:id="@+id/spinner"/>
+
         <com.example.ericliu.photomosaic.ui.TileView
             android:id="@+id/ivMain"
             android:layout_width="match_parent"
             android:layout_height="500dp"
-            android:layout_alignParentStart="true"
-            android:layout_below="@+id/btnPickPhoto"/>
+            android:layout_below="@+id/spinner"
+            android:layout_alignParentStart="true"/>
 
 
     </RelativeLayout>

@@ -8,7 +8,8 @@ import android.util.Pair;
 import android.view.SurfaceHolder;
 
 import com.example.ericliu.photomosaic.ui.base.RenderView;
-import com.example.ericliu.photomosaic.ui.filter.MosaicFilter;
+import com.example.ericliu.photomosaic.ui.filter.FilterFactory;
+import com.example.ericliu.photomosaic.ui.filter.ImageFilter;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -25,6 +26,9 @@ public class TileView extends RenderView implements SurfaceHolder.Callback {
     private int mGridWidth = 32;
     private int mGridHeight = 32;
 
+
+    private FilterFactory.FilterType mImageFilterType;
+
     public enum RenderDirection {
         HORIZONTAL, VERTICAL;
     }
@@ -33,6 +37,10 @@ public class TileView extends RenderView implements SurfaceHolder.Callback {
         super(context, attrs);
     }
 
+
+    public void setImageFilterType(FilterFactory.FilterType imageFilterType) {
+        mImageFilterType = imageFilterType;
+    }
 
     public void renderTiles(RenderDirection direction) {
         if (mBackgroundBitmap == null && mDrawingLayerBitmap != null) {
@@ -71,7 +79,6 @@ public class TileView extends RenderView implements SurfaceHolder.Callback {
     }
 
 
-
     private void renderVertically(Rect[][] rects) {
 
         for (int horIndex = 0; horIndex < rects.length; horIndex++) {
@@ -91,15 +98,17 @@ public class TileView extends RenderView implements SurfaceHolder.Callback {
                 List<Pair<Rect, Bitmap>> pairList = new ArrayList<>();
 
                 for (Rect tileRect : rectArray) {
-                    Bitmap tileBitmap = MosaicFilter.createTile(tileRect, mBackgroundBitmap);
-                    pairList.add(new Pair(tileRect, tileBitmap));
+                    ImageFilter imageFilter = FilterFactory.getImageFilter(mImageFilterType);
+                    if (imageFilter != null) {
+                        Bitmap tileBitmap = imageFilter.createTile(tileRect, mBackgroundBitmap);
+                        pairList.add(new Pair(tileRect, tileBitmap));
+                    }
                 }
                 return pairList;
 
             }
         };
     }
-
 
 
     public static Rect[][] getGridRects(Bitmap bitmap, int gridWidth, int gridHeight) {

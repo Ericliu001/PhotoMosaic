@@ -11,11 +11,10 @@ import com.example.ericliu.photomosaic.util.BitmapUtils;
  * Created by ericliu on 28/07/2016.
  */
 
-public final class MosaicFilter {
-    private MosaicFilter(){}
+public class MosaicFilter implements ImageFilter {
 
 
-    public static Bitmap createTile(Rect tileRect, Bitmap srcBitmap) {
+    public Bitmap createTile(Rect tileRect, Bitmap srcBitmap) {
         Bitmap tileBitmap = Bitmap.createBitmap(tileRect.width(), tileRect.height(), Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(tileBitmap);
         int color = BitmapUtils.getAverageColor(srcBitmap, tileRect);

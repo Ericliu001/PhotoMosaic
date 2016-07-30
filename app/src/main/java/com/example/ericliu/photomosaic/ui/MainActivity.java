@@ -6,10 +6,17 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.Spinner;
 
 import com.example.ericliu.photomosaic.CacheFragment;
 import com.example.ericliu.photomosaic.R;
+import com.example.ericliu.photomosaic.ui.filter.FilterFactory;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements HomePageContract.View {
 
@@ -18,6 +25,7 @@ public class MainActivity extends AppCompatActivity implements HomePageContract.
 
     private Button btnPickPhoto, btnMosaicVertical, btnMosaicHorizontal, btnClear;
     private TileView ivMain;
+    private Spinner filterSpinner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,6 +89,29 @@ public class MainActivity extends AppCompatActivity implements HomePageContract.
         });
 
         ivMain = (TileView) findViewById(R.id.ivMain);
+
+
+        final List<String> filterNames = new ArrayList<>();
+        for (FilterFactory.FilterType filterType : FilterFactory.FilterType.values()) {
+            filterNames.add(filterType.toString());
+        }
+
+        filterSpinner = (Spinner) findViewById(R.id.spinner);
+        filterSpinner.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, filterNames));
+        filterSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                FilterFactory.FilterType filterType = FilterFactory.FilterType.valueOf(filterNames.get(position));
+                if (filterType != null) {
+                    ivMain.setImageFilterType(filterType);
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
     }
 
 
