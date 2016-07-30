@@ -97,7 +97,7 @@ public class MainActivity extends AppCompatActivity implements HomePageContract.
         }
 
         filterSpinner = (Spinner) findViewById(R.id.spinner);
-        filterSpinner.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, filterNames));
+        filterSpinner.setAdapter(new ArrayAdapter<String>(this, R.layout.layout_filter_spinner_item, R.id.textView, filterNames));
         filterSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {

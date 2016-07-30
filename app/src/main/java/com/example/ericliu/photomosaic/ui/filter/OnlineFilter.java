@@ -61,12 +61,12 @@ public class OnlineFilter implements ImageFilter {
 
     @Override
     public int getGridHeight() {
-        return 128;
+        return 64;
     }
 
     @Override
     public int getGridWidth() {
-        return 128;
+        return 64;
     }
 
 

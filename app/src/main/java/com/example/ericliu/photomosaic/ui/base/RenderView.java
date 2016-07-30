@@ -260,8 +260,12 @@ public class RenderView extends SurfaceView implements SurfaceHolder.Callback {
     public void clearEffects() {
         cancelAllTasks();
         synchronized (holder) {
-            Bitmap.Config conf = Bitmap.Config.ARGB_8888; // see other conf types
-            mDrawingLayerBitmap = Bitmap.createBitmap(mImageWidth, mImageHeight, conf);
+            if (mImageHeight > 0 && mImageWidth > 0) {
+
+                Bitmap.Config conf = Bitmap.Config.ARGB_8888; // see other conf types
+                mDrawingLayerBitmap = Bitmap.createBitmap(mImageWidth, mImageHeight, conf);
+            }
+
         }
     }
 
